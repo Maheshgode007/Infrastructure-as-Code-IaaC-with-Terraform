@@ -1,0 +1,54 @@
+Infrastructure as Code (IaaC) with Terraform
+Create infrastructure on cloud platforms like AWS using Terraform. You can provision resources like EC2 instances, RDS, load balancers, and auto-scaling groups via gitlab actions to make CICD automation using github actions.
+Set up a VPC.
+Launch an EC2 instance.
+(Optional) Add Security Groups, Key Pairs, and S3 Buckets.
+aws-terraform-project/
+folder structure:-
+├── main.tf         # Main configuration
+├── variables.tf    # Input variables
+├── outputs.tf      # Output info
+├── provider.tf     # AWS credentials/region
+provider.tf – AWS Provider Setup:-
+provider "aws" {
+  region  = var.region
+  profile = var.aws_profile  # optional if you're using named profiles
+}
+variables.tf – Input Variables:-
+variable "region" {
+  description = "AWS region"
+  default     = "us-east-1"
+}
+
+variable "aws_profile" {
+  description = "AWS CLI profile"
+  default     = "default"
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  default     = "t2.micro"
+}
+
+variable "ami_id" {
+  description = "AMI ID for EC2"
+  default     = "ami-0c55b159cbfafe1f0" # Example for Amazon Linux 2 in us-east-1
+}
+main.tf – Main Resources:-
+resource "aws_instance" "web_server" {
+  ami           = var.ami_id
+  instance_type = var.instance_type
+
+  tags = {
+    Name = "TerraformEC2"
+  }
+}
+outputs.tf – Show Info After Apply:-
+output "instance_id" {
+  value = aws_instance.web_server.id
+}
+
+output "public_ip" {
+  value = aws_instance.web_server.public_ip
+}
+
